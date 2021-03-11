@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.typesafe.play:twirl-api_2.12:1.4.2">
+    <CLASSES>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/com/typesafe/play/twirl-api_2.12/1.4.2/twirl-api_2.12-1.4.2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/com/typesafe/play/twirl-api_2.12/1.4.2/twirl-api_2.12-1.4.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/com/typesafe/play/twirl-api_2.12/1.4.2/twirl-api_2.12-1.4.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

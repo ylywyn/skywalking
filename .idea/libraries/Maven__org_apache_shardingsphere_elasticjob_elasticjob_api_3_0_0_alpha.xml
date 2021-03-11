@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.shardingsphere.elasticjob:elasticjob-api:3.0.0-alpha">
+    <CLASSES>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/org/apache/shardingsphere/elasticjob/elasticjob-api/3.0.0-alpha/elasticjob-api-3.0.0-alpha.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/org/apache/shardingsphere/elasticjob/elasticjob-api/3.0.0-alpha/elasticjob-api-3.0.0-alpha-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/org/apache/shardingsphere/elasticjob/elasticjob-api/3.0.0-alpha/elasticjob-api-3.0.0-alpha-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

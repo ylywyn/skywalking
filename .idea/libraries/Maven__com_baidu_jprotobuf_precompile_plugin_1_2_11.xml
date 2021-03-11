@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.baidu:jprotobuf-precompile-plugin:1.2.11">
+    <CLASSES>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/com/baidu/jprotobuf-precompile-plugin/1.2.11/jprotobuf-precompile-plugin-1.2.11.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/com/baidu/jprotobuf-precompile-plugin/1.2.11/jprotobuf-precompile-plugin-1.2.11-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://D:/Program Files/apache-maven-repo/repo/com/baidu/jprotobuf-precompile-plugin/1.2.11/jprotobuf-precompile-plugin-1.2.11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
