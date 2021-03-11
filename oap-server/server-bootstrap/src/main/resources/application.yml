@@ -102,8 +102,9 @@ core:
     searchableTracesTags: ${SW_SEARCHABLE_TAG_KEYS:http.method,status_code,db.type,db.instance,mq.queue,mq.topic,mq.broker}
     # Define the set of log tag keys, which should be searchable through the GraphQL.
     searchableLogsTags: ${SW_SEARCHABLE_LOGS_TAG_KEYS:level}
+    persistentPeriod: ${SW_CORE_PERSISTENT_PERIOD:60}
 storage:
-  selector: ${SW_STORAGE:h2}
+  selector: ${SW_STORAGE:mysql}
   elasticsearch:
     nameSpace: ${SW_NAMESPACE:""}
     clusterNodes: ${SW_STORAGE_ES_CLUSTER_NODES:localhost:9200}
@@ -167,9 +168,9 @@ storage:
     numOfSearchableValuesPerTag: ${SW_STORAGE_NUM_OF_SEARCHABLE_VALUES_PER_TAG:2}
   mysql:
     properties:
-      jdbcUrl: ${SW_JDBC_URL:"jdbc:mysql://localhost:3306/swtest"}
-      dataSource.user: ${SW_DATA_SOURCE_USER:root}
-      dataSource.password: ${SW_DATA_SOURCE_PASSWORD:root@1234}
+      jdbcUrl: ${SW_JDBC_URL:"jdbc:mysql://10.168.99.182:3306/swtest?useUnicode=true&characterEncoding=utf-8&useSSL=false"}
+      dataSource.user: ${SW_DATA_SOURCE_USER:dq}
+      dataSource.password: ${SW_DATA_SOURCE_PASSWORD:Autofuck123!}
       dataSource.cachePrepStmts: ${SW_DATA_SOURCE_CACHE_PREP_STMTS:true}
       dataSource.prepStmtCacheSize: ${SW_DATA_SOURCE_PREP_STMT_CACHE_SQL_SIZE:250}
       dataSource.prepStmtCacheSqlLimit: ${SW_DATA_SOURCE_PREP_STMT_CACHE_SQL_LIMIT:2048}

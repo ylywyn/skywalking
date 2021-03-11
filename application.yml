@@ -168,7 +168,7 @@ storage:
     numOfSearchableValuesPerTag: ${SW_STORAGE_NUM_OF_SEARCHABLE_VALUES_PER_TAG:2}
   mysql:
     properties:
-      jdbcUrl: ${SW_JDBC_URL:"jdbc:mysql://10.168.99.182:3306/swtest"}
+      jdbcUrl: ${SW_JDBC_URL:"jdbc:mysql://10.168.99.182:3306/swtest?useUnicode=true&characterEncoding=utf-8&useSSL=false"}
       dataSource.user: ${SW_DATA_SOURCE_USER:dq}
       dataSource.password: ${SW_DATA_SOURCE_PASSWORD:Autofuck123!}
       dataSource.cachePrepStmts: ${SW_DATA_SOURCE_CACHE_PREP_STMTS:true}
