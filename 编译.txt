@@ -1,0 +1,21 @@
+# windows下执行 mvn compile -Dmaven.test.skip=true
+mvnw clean package -DskipTests
+
+# 第二次为了避免重复构建全部源码，可以对某个模块编译并打完整包
+# 编译 agent 包
+mvnw package -Pagent,dist
+# 编译 backend 包并且打完整包
+mvnw package -Pbackend,dist
+# 编译 UI 忽略Tests，并且打完整包
+mvnw package -Pui,dist -DskipTests
+
+mvnw package -Pagent,backend,dist  -DskipTests
+
+mvnw package -Pagent,dist  -DskipTests
+
+server配置文件路径
+E:\Code\java\skywalking\oap-server\server-bootstrap\target\classes\alarm-settings.yml
+
+
+Ui: npm install
+npm run serve
