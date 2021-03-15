@@ -250,15 +250,20 @@ public class SkyWalkingAgent {
         String serviceName = Config.Agent.SERVICE_NAME;
         String appName = System.getenv("CLUSTER_APP_NAME");
         if (StringUtil.isEmpty(serviceName) || serviceName.startsWith("Your_ApplicationName")) {
-            if (!StringUtil.isEmpty(appName)) {
+            if (StringUtil.isNotEmpty(appName)) {
                 Config.Agent.SERVICE_NAME = appName;
             }
         }
 
-        Config.Agent.INSTANCE_NAME = System.getenv("POD_IP");
+        String instance = System.getenv("POD_IP");
+        if (StringUtil.isNotEmpty(instance)) {
+            Config.Agent.INSTANCE_NAME = instance;
+        }
+
 
         boolean isDevEnv = false;
-        if (!System.getenv("CLUSTER_ENV").toLowerCase().contains("prod")) {
+        String envLevel = System.getenv("CLUSTER_ENV");
+        if (StringUtil.isNotEmpty(envLevel) && envLevel.toLowerCase().contains("prod")) {
             isDevEnv = true;
         }
 
