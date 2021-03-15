@@ -104,10 +104,10 @@ core:
     searchableLogsTags: ${SW_SEARCHABLE_LOGS_TAG_KEYS:level}
     persistentPeriod: ${SW_CORE_PERSISTENT_PERIOD:60}
 storage:
-  selector: ${SW_STORAGE:mysql}
+  selector: ${SW_STORAGE:elasticsearch}
   elasticsearch:
-    nameSpace: ${SW_NAMESPACE:""}
-    clusterNodes: ${SW_STORAGE_ES_CLUSTER_NODES:localhost:9200}
+    nameSpace: ${SW_NAMESPACE:"cmp"}
+    clusterNodes: ${SW_STORAGE_ES_CLUSTER_NODES:yz-test1.es6.autohome.com.cn:80}
     protocol: ${SW_STORAGE_ES_HTTP_PROTOCOL:"http"}
     user: ${SW_ES_USER:""}
     password: ${SW_ES_PASSWORD:""}

@@ -260,10 +260,9 @@ public class SkyWalkingAgent {
             Config.Agent.INSTANCE_NAME = instance;
         }
 
-
         boolean isDevEnv = false;
         String envLevel = System.getenv("CLUSTER_ENV");
-        if (StringUtil.isNotEmpty(envLevel) && envLevel.toLowerCase().contains("prod")) {
+        if (StringUtil.isNotEmpty(envLevel) && !envLevel.toLowerCase().contains("prod")) {
             isDevEnv = true;
         }
 
