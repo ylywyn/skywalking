@@ -55,7 +55,6 @@ import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.CacheableTransforme
 import org.apache.skywalking.apm.agent.core.plugin.jdk9module.JDK9ModuleExporter;
 import org.apache.skywalking.apm.util.StringUtil;
 
-
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
 import static net.bytebuddy.matcher.ElementMatchers.not;
@@ -325,7 +324,6 @@ class RegisterThreadImpl implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // 关闭资源
             if (null != br) {
                 try {
                     br.close();
@@ -345,4 +343,4 @@ class RegisterThreadImpl implements Runnable {
             connection.disconnect();
         }
     }
-};
+}
