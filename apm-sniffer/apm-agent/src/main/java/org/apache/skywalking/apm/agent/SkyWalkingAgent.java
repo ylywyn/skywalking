@@ -73,7 +73,7 @@ public class SkyWalkingAgent {
         final PluginFinder pluginFinder;
         try {
             SnifferConfigInitializer.initializeCoreConfig(agentArgs);
-            initForAutoCmp();
+            InitForAutoCmp();
         } catch (Exception e) {
             // try to resolve a new logger, and use the new logger to write the error log here
             LogManager.getLogger(SkyWalkingAgent.class)
@@ -247,7 +247,7 @@ public class SkyWalkingAgent {
         }
     }
 
-    public static void initForAutoCmp() {
+    public static void InitForAutoCmp() {
         String serviceName = Config.Agent.SERVICE_NAME;
         String appName = System.getenv("CLUSTER_APP_NAME");
         if (StringUtil.isEmpty(serviceName) || serviceName.startsWith("Your_ApplicationName")) {
