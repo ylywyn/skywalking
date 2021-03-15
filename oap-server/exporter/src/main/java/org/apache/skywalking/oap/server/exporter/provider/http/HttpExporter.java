@@ -115,9 +115,14 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
     }
 
     private void send(List<ExportData> data) {
-        int j = 0;
         final int batchCount = 1024;
-        List<CmpMetric> ms = new ArrayList<CmpMetric>();
+        int cap = batchCount;
+        if (data.size() < cap) {
+            cap = data.size();
+        }
+
+        int j = 0;
+        List<CmpMetric> ms = new ArrayList<CmpMetric>(cap + 1);
         for (int i = 0; i < data.size(); i++) {
             CmpMetric m = toCmpMetric(data.get(i));
             if (m == null) {
@@ -161,16 +166,16 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
                         return;
                     }
 
-                    String restpStr = response.body().string();
-                    if (restpStr.length() > 256) {
-                        LOGGER.error("Post Metrics error:  ret {}", restpStr);
+                    String respBody = response.body().string();
+                    if (respBody.length() > 256) {
+                        LOGGER.error("Post Metrics error:  ret {}", respBody);
                         LOGGER.error("Post Metrics error:  data {}", jsonStr);
                         return;
                     }
 
-                    MetricPostResp ret = gson.fromJson(restpStr, MetricPostResp.class);
-                    if (ret != null && ( ret.code == 0)) {
-                        LOGGER.error("Post Metrics error:  ret {}", restpStr);
+                    MetricPostResp ret = gson.fromJson(respBody, MetricPostResp.class);
+                    if (ret != null && (ret.code == 0)) {
+                        LOGGER.error("Post Metrics error:  ret {}", respBody);
                     }
                     LOGGER.info("Post Metrics size: {}, time:{}ms", data.size(), System.currentTimeMillis() - begin);
                 }

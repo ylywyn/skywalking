@@ -18,7 +18,13 @@
 
 package org.apache.skywalking.apm.agent;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.instrument.Instrumentation;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +53,8 @@ import org.apache.skywalking.apm.agent.core.plugin.PluginFinder;
 import org.apache.skywalking.apm.agent.core.plugin.bootstrap.BootstrapInstrumentBoost;
 import org.apache.skywalking.apm.agent.core.plugin.bytebuddy.CacheableTransformerDecorator;
 import org.apache.skywalking.apm.agent.core.plugin.jdk9module.JDK9ModuleExporter;
+import org.apache.skywalking.apm.util.StringUtil;
+
 
 import static net.bytebuddy.matcher.ElementMatchers.nameContains;
 import static net.bytebuddy.matcher.ElementMatchers.nameStartsWith;
@@ -65,6 +73,7 @@ public class SkyWalkingAgent {
         final PluginFinder pluginFinder;
         try {
             SnifferConfigInitializer.initializeCoreConfig(agentArgs);
+            initForAutoCmp();
         } catch (Exception e) {
             // try to resolve a new logger, and use the new logger to write the error log here
             LogManager.getLogger(SkyWalkingAgent.class)
@@ -237,4 +246,103 @@ public class SkyWalkingAgent {
             /* do nothing */
         }
     }
+
+    public static void initForAutoCmp() {
+        String serviceName = Config.Agent.SERVICE_NAME;
+        String appName = System.getenv("CLUSTER_APP_NAME");
+        if (StringUtil.isEmpty(serviceName) || serviceName.startsWith("Your_ApplicationName")) {
+            if (!StringUtil.isEmpty(appName)) {
+                Config.Agent.SERVICE_NAME = appName;
+            }
+        }
+
+        Config.Agent.INSTANCE_NAME = System.getenv("POD_IP");
+
+        boolean isDevEnv = false;
+        if (!System.getenv("CLUSTER_ENV").toLowerCase().contains("prod")) {
+            isDevEnv = true;
+        }
+
+        if (StringUtil.isEmpty(Config.Collector.BACKEND_SERVICE)) {
+            Config.Collector.BACKEND_SERVICE = "apm-collector.cloud.corpautohome.com:11800";
+            if (isDevEnv) {
+                Config.Collector.BACKEND_SERVICE = "monitor-gateway-intranet.autohome.com.cn:11800";
+            }
+        }
+
+        String cmpUrl = "http://auto-cloud-monitor.openapi.corpautohome.com";
+        if (isDevEnv) {
+            cmpUrl = "http://auto-cloud-monitor-lf-pre.openapi.corpautohome.com";
+        }
+
+        RegisterThreadImpl mt = new RegisterThreadImpl(Config.Agent.SERVICE_NAME, appName, cmpUrl + "/api/v1/apm/dashboard/global/register");
+        Thread t = new Thread(mt, "RegisterThread");
+        t.run();
+    }
 }
+
+class RegisterThreadImpl implements Runnable {
+    private String name;
+    private String app;
+    private String addr;
+
+    RegisterThreadImpl(String name, String app, String addr) {
+        this.name = name;
+        this.app = app;
+        this.addr = addr;
+    }
+
+    public void run() {
+        HttpURLConnection connection = null;
+        InputStream is = null;
+        BufferedReader br = null;
+        String result = "";
+        try {
+            URL url = new URL(addr);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(60000);
+            connection.connect();
+            if (connection.getResponseCode() == 200) {
+                is = connection.getInputStream();
+                br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                StringBuffer sbf = new StringBuffer();
+                String temp = null;
+                while ((temp = br.readLine()) != null) {
+                    sbf.append(temp);
+                    sbf.append("\r\n");
+                }
+                result = sbf.toString();
+                if (result.contains("ok")) {
+                    LogManager.getLogger(SkyWalkingAgent.class)
+                            .error("SkyWalking agent  Register Ok!");
+                } else {
+                    LogManager.getLogger(SkyWalkingAgent.class)
+                            .error("SkyWalking agent  Register error:" + result);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // 关闭资源
+            if (null != br) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (null != is) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            connection.disconnect();
+        }
+    }
+};
