@@ -292,10 +292,13 @@ class RegisterThreadImpl implements Runnable {
     RegisterThreadImpl(String name, String app, String addr) {
         this.name = name;
         this.app = app;
-        this.addr = addr;
+        this.addr = String.format("%s?name=%s&app=%s", addr, name, app);
     }
 
     public void run() {
+        LogManager.getLogger(SkyWalkingAgent.class)
+                .error("SkyWalking agent  Register Url " + addr);
+
         HttpURLConnection connection = null;
         InputStream is = null;
         BufferedReader br = null;
