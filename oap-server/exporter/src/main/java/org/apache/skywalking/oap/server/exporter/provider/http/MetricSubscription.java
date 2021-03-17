@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class MetricSubscription {
-    private String cmpAddr = "http://auto-cloud-monitor.openapi.corpautohome.com/api/v1";
+    private String cmpAddr = "";
     private final int pageSize = 1024;
     private long version = -1;
     private OkHttpClient httpClient;
@@ -41,10 +41,8 @@ public class MetricSubscription {
         return ret;
     }
 
-    public MetricSubscription(boolean dev) {
-        if (dev) {
-            cmpAddr = "http://auto-cloud-monitor-lf-pre.openapi.corpautohome.com/api/v1";
-        }
+    public MetricSubscription(String addr) {
+        this.cmpAddr = addr;
     }
 
     public boolean update() {
@@ -53,12 +51,12 @@ public class MetricSubscription {
             return false;
         }
 
-        if (resp.version == this.version) {
+        if (resp.Version == this.version) {
             return true;
         }
 
         //all
-        if (resp.isAll) {
+        if (resp.IsAll) {
             HashMap<String, Set<String>> newMap = new HashMap<>();
             newMap = addTo(resp, newMap);
             boolean isOk = true;
@@ -69,14 +67,14 @@ public class MetricSubscription {
                     isOk = false;
                     break;
                 }
-                if (temp.count == 0 || temp.details == null) {
+                if (temp.Count == 0 || temp.Details == null) {
                     break;
                 }
                 i += 1;
                 newMap = addTo(resp, newMap);
             }
             if (isOk) {
-                this.version = resp.version;
+                this.version = resp.Version;
                 lock.writeLock().lock();
                 this.subscriptions = newMap;
                 lock.writeLock().unlock();
@@ -90,12 +88,12 @@ public class MetricSubscription {
         }
 
         //part
-        if (resp.details == null) {
+        if (resp.Details == null) {
             return true;
         }
 
-        for (int i = 0; i < resp.details.length; i++) {
-            MetricSubRespDetail detail = resp.details[i];
+        for (int i = 0; i < resp.Details.length; i++) {
+            MetricSubRespDetail detail = resp.Details[i];
             if (detail.items == null || detail.items.length == 0) {
                 continue;
             }
@@ -109,7 +107,7 @@ public class MetricSubscription {
                 default:
             }
         }
-        this.version = resp.version;
+        this.version = resp.Version;
         LOGGER.info("MetricSubscription update part version {}", this.version);
         return true;
     }
@@ -117,10 +115,11 @@ public class MetricSubscription {
     private MetricSubResp getFromAutoCmp(String addr, int page) {
         MetricSubResp ret = null;
         String body = null;
+        Response response = null;
         try {
             String url = String.format("%s/apm/syncMetric?page=%d&size=%d&oldVersion=%d", addr, page, pageSize, version);
             Request request = new Request.Builder().url(url).get().build();
-            Response response = httpClient.newCall(request).execute();
+            response = httpClient.newCall(request).execute();
             if (response.code() != 200) {
                 LOGGER.error("getFromAutoCmp response.code: {}", response.code());
                 return null;
@@ -128,7 +127,14 @@ public class MetricSubscription {
 
             Gson gson = new Gson();
             body = response.body().string();
-            ret = gson.fromJson(body, MetricSubResp.class);
+            AutoCmpMetricSubResp cmpResp = gson.fromJson(body, AutoCmpMetricSubResp.class);
+            if (cmpResp != null) {
+                if (cmpResp.code == 1) {
+                    ret = cmpResp.data;
+                } else {
+                    LOGGER.error("getFromAutoCmp error: {}", cmpResp.error);
+                }
+            }
         } catch (Exception e) {
             if (body != null) {
                 LOGGER.error("getFromAutoCmp error: {}", body);
@@ -136,7 +142,9 @@ public class MetricSubscription {
                 LOGGER.error("getFromAutoCmp error: {}", e.getMessage());
             }
         } finally {
-
+            if (response != null) {
+                response.close();
+            }
         }
         return ret;
     }
@@ -152,6 +160,7 @@ public class MetricSubscription {
             Set<String> set = subscriptions.get(item[0]);
             if (set == null) {
                 set = new HashSet<>();
+                subscriptions.put(item[0], set);
             }
             set.add(item[1]);
         }
@@ -184,17 +193,18 @@ public class MetricSubscription {
     }
 
     private HashMap<String, Set<String>> addTo(MetricSubResp resp, HashMap<String, Set<String>> map) {
-        if (resp.details == null || resp.details.length != 1) {
+        if (resp.Details == null || resp.Details.length != 1) {
             return map;
         }
 
-        String[][] data = resp.details[0].items;
+        String[][] data = resp.Details[0].items;
         for (int i = 0; i < data.length; i++) {
             String[] items = data[i];
             if (items.length == 2) {
                 Set<String> s = map.get(items[0]);
                 if (s == null) {
                     s = new HashSet<>();
+                    map.put(items[0], s);
                 }
                 s.add(items[1]);
             }
@@ -217,13 +227,19 @@ class TimerTask implements Runnable {
 }
 
 class MetricSubResp {
-    public int count;
-    public long version;
-    public boolean isAll;
-    public MetricSubRespDetail[] details;
+    public int Count;
+    public long Version;
+    public boolean IsAll;
+    public MetricSubRespDetail[] Details;
 }
 
 class MetricSubRespDetail {
     String type;
     String[][] items;
+}
+
+class AutoCmpMetricSubResp {
+    public int code;
+    public String error;
+    public MetricSubResp data;
 }

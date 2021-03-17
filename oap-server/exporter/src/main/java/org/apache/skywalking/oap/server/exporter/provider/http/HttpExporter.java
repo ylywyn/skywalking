@@ -59,11 +59,16 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
         exportBuffer.consume(this, 1, 1000);
         httpClient = new OkHttpClient.Builder().writeTimeout(1, TimeUnit.MINUTES).readTimeout(1, TimeUnit.MINUTES).build();
 
-        boolean dev = false;
-        if (setting.getCmpGateWay().contains("monitor-insight-gateway-test")) {
-            dev = true;
+        String cmpAddr = setting.getCmpAddr();
+        if (cmpAddr.length() == 0) {
+            if (setting.getCmpGateWay().contains("monitor-insight-gateway-test")) {
+                cmpAddr = "http://auto-cloud-monitor-lf-pre.openapi.corpautohome.com/api/v1";
+            } else {
+                cmpAddr = "http://auto-cloud-monitor.openapi.corpautohome.com/api/v1";
+            }
         }
-        subscription = new MetricSubscription(dev);
+
+        subscription = new MetricSubscription(cmpAddr);
     }
 
     @Override
