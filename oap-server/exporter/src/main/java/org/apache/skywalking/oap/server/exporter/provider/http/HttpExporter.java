@@ -44,22 +44,26 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpExporter.class);
     private HttpExporterSetting setting;
     private final DataCarrier exportBuffer;
-    private final Set<String> subscriptionSet;
 
     private final OkHttpClient httpClient;
     private static final MediaType jsonMediaType = MediaType.parse("application/json; charset=utf-8");
 
     private int waitCount = 0;
     private List<ExportData> dataBuffer;
+    private MetricSubscription subscription;
 
 
     public HttpExporter(HttpExporterSetting setting) {
         this.setting = setting;
         exportBuffer = new DataCarrier<ExportData>(setting.getBufferChannelNum(), setting.getBufferChannelSize());
         exportBuffer.consume(this, 1, 1000);
-        subscriptionSet = new HashSet<>();
-
         httpClient = new OkHttpClient.Builder().writeTimeout(1, TimeUnit.MINUTES).readTimeout(1, TimeUnit.MINUTES).build();
+
+        boolean dev = false;
+        if (setting.getCmpGateWay().contains("monitor-insight-gateway-test")) {
+            dev = true;
+        }
+        subscription = new MetricSubscription(dev);
     }
 
     @Override
@@ -68,13 +72,16 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
             Metrics metrics = event.getMetrics();
             if (metrics instanceof WithMetadata) {
                 MetricsMetaInfo meta = ((WithMetadata) metrics).getMeta();
-                exportBuffer.produce(new ExportData(meta, metrics));
+                if (subscription.contains(meta.getMetricsName(), metrics.id())) {
+                    exportBuffer.produce(new ExportData(meta, metrics));
+                }
             }
         }
     }
 
     public void initSubscriptionList() {
-        LOGGER.debug("Get exporter subscription list, {}", subscriptionSet);
+        // LOGGER.debug("Get exporter subscription list, {}", subscriptionSet);
+        subscription.runSubscription();
     }
 
     @Override
