@@ -124,9 +124,19 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
         }
 
         int j = 0;
+        ExportData temp = null;
         List<CmpMetric> ms = new ArrayList<CmpMetric>(cap + 1);
+
+        //
+        Calendar now = Calendar.getInstance();
+        int minute = now.get(Calendar.MINUTE);
         for (int i = 0; i < data.size(); i++) {
-            CmpMetric m = toCmpMetric(data.get(i));
+            temp = data.get(i);
+            if (temp.getMetrics().getTimeBucket() % 100 == minute) {
+                continue;
+            }
+
+            CmpMetric m = toCmpMetric(temp);
             if (m == null) {
                 continue;
             }
@@ -204,23 +214,26 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
             return null;
         }
 
+        //LOGGER.info(cm.metric + " " + d.getMeta().toString() + " " + metrics.getTimeBucket() + "===" + cm.value);
         return cm;
     }
 
     private CmpMetric getCmpMetric(MetricsMetaInfo meta) {
-        CmpMetric cm = metricCache.get(meta.getId());
+        final String metaId = meta.getId();
+        final String metricName = meta.getMetricsName();
+        final String key = metricName + metaId;
+        CmpMetric cm = metricCache.get(key);
         if (cm != null) {
             return cm;
         }
 
         cm = new CmpMetric();
-        cm.metric = meta.getMetricsName();
+        cm.metric = metricName;
         cm.tags = new String[2][];
 
         String name = "name";
         String service = "service";
         int scope = meta.getScope();
-        final String metaId = meta.getId();
         if (DefaultScopeDefine.inServiceCatalog(scope)) {
             final IDManager.ServiceID.ServiceIDDefinition serviceIDDefinition = IDManager.ServiceID.analysisId(metaId);
             name = serviceIDDefinition.getName();
@@ -249,7 +262,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
         cm.tags[0] = new String[]{"name", name};
         cm.tags[1] = new String[]{"service", service};
 
-        metricCache.put(metaId, cm);
+        metricCache.put(key, cm);
         return cm;
     }
 }
