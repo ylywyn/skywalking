@@ -26,6 +26,7 @@ import okhttp3.*;
 import com.google.gson.Gson;
 import org.apache.skywalking.apm.commons.datacarrier.DataCarrier;
 import org.apache.skywalking.apm.commons.datacarrier.consumer.IConsumer;
+import org.apache.skywalking.oap.server.core.analysis.IDManager;
 import org.apache.skywalking.oap.server.core.analysis.metrics.DoubleValueHolder;
 import org.apache.skywalking.oap.server.core.analysis.metrics.IntValueHolder;
 import org.apache.skywalking.oap.server.core.analysis.metrics.LongValueHolder;
@@ -36,6 +37,7 @@ import org.apache.skywalking.oap.server.core.analysis.metrics.WithMetadata;
 import org.apache.skywalking.oap.server.core.exporter.ExportData;
 import org.apache.skywalking.oap.server.core.exporter.ExportEvent;
 import org.apache.skywalking.oap.server.core.exporter.MetricValuesExportService;
+import org.apache.skywalking.oap.server.core.source.DefaultScopeDefine;
 import org.apache.skywalking.oap.server.exporter.provider.MetricFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +50,8 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
     private final OkHttpClient httpClient;
     private static final MediaType jsonMediaType = MediaType.parse("application/json; charset=utf-8");
 
-    private int waitCount = 0;
-    private List<ExportData> dataBuffer;
     private MetricSubscription subscription;
+    private HashMap<String, CmpMetric> metricCache = new HashMap<String, CmpMetric>();
 
 
     public HttpExporter(HttpExporterSetting setting) {
@@ -77,7 +78,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
             Metrics metrics = event.getMetrics();
             if (metrics instanceof WithMetadata) {
                 MetricsMetaInfo meta = ((WithMetadata) metrics).getMeta();
-                if (subscription.contains(meta.getMetricsName(), metrics.id())) {
+                if (subscription.contains(meta.getMetricsName(), meta.getId())) {
                     exportBuffer.produce(new ExportData(meta, metrics));
                 }
             }
@@ -96,23 +97,12 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
 
     @Override
     public void consume(List<ExportData> data) {
-        // 积累更多的数据，合并发送
-        waitCount += 1;
         if (data.size() > 0) {
-            if (dataBuffer == null) {
-                dataBuffer = data;
-            } else {
-                dataBuffer.addAll(data);
-            }
-        }
+            send(data);
 
-        // 最多积累5次, 或者数据超过128个 发送一次
-        if ((waitCount >= 5) || (dataBuffer != null && dataBuffer.size() > 128)) {
-            waitCount = 0;
-            if (dataBuffer != null && dataBuffer.size() > 0) {
-                send(dataBuffer);
+            if (metricCache.size() > 200000) {
+                metricCache.clear();
             }
-            dataBuffer = null;
         }
     }
 
@@ -198,8 +188,8 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
     }
 
     private CmpMetric toCmpMetric(ExportData d) {
+        CmpMetric cm = getCmpMetric(d.getMeta());
         Metrics metrics = d.getMetrics();
-        CmpMetric cm = new CmpMetric();
         if (metrics instanceof LongValueHolder) {
             long value = ((LongValueHolder) metrics).getValue();
             cm.value = (double) value;
@@ -208,22 +198,58 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
             cm.value = (double) value;
         } else if (metrics instanceof DoubleValueHolder) {
             cm.value = ((DoubleValueHolder) metrics).getValue();
-
         } else if (metrics instanceof MultiIntValuesHolder) {
             return null;
         } else {
             return null;
         }
 
-        MetricsMetaInfo meta = d.getMeta();
+        return cm;
+    }
 
-        cm.metric = meta.getMetricsName();
-        String entityName = getEntityName(meta);
-        if (entityName == null) {
-            return null;
+    private CmpMetric getCmpMetric(MetricsMetaInfo meta) {
+        CmpMetric cm = metricCache.get(meta.getId());
+        if (cm != null) {
+            return cm;
         }
-        cm.tags = new String[1][];
-        cm.tags[0] = new String[]{"name", entityName};
+
+        cm = new CmpMetric();
+        cm.metric = meta.getMetricsName();
+        cm.tags = new String[2][];
+
+        String name = "name";
+        String service = "service";
+        int scope = meta.getScope();
+        final String metaId = meta.getId();
+        if (DefaultScopeDefine.inServiceCatalog(scope)) {
+            final IDManager.ServiceID.ServiceIDDefinition serviceIDDefinition = IDManager.ServiceID.analysisId(metaId);
+            name = serviceIDDefinition.getName();
+            service = name;
+        } else if (DefaultScopeDefine.inServiceInstanceCatalog(scope)) {
+            final IDManager.ServiceInstanceID.InstanceIDDefinition instanceIDDefinition = IDManager.ServiceInstanceID.analysisId(metaId);
+            name = instanceIDDefinition.getName();
+            IDManager.ServiceID.ServiceIDDefinition serviceIDDefinition = IDManager.ServiceID.analysisId(instanceIDDefinition.getServiceId());
+            service = serviceIDDefinition.getName();
+        } else if (DefaultScopeDefine.inEndpointCatalog(scope)) {
+            final IDManager.EndpointID.EndpointIDDefinition endpointIDDefinition = IDManager.EndpointID.analysisId(metaId);
+            name = endpointIDDefinition.getEndpointName();
+            IDManager.ServiceID.ServiceIDDefinition serviceIDDefinition = IDManager.ServiceID.analysisId(
+                    endpointIDDefinition.getServiceId());
+            service = serviceIDDefinition.getName();
+        } else {
+        }
+
+        if (name == null) {
+            name = "name";
+        }
+        if (service == null) {
+            service = "service";
+        }
+
+        cm.tags[0] = new String[]{"name", name};
+        cm.tags[1] = new String[]{"service", service};
+
+        metricCache.put(metaId, cm);
         return cm;
     }
 }
@@ -240,3 +266,4 @@ class MetricPostResp {
     public String error;
     public int data;
 }
+

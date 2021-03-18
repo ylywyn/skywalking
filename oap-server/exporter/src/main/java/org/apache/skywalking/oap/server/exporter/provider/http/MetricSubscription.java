@@ -98,10 +98,10 @@ public class MetricSubscription {
                 continue;
             }
             switch (detail.type) {
-                case "add":
+                case "ADD":
                     addOp(detail.items);
                     break;
-                case "del":
+                case "DEL":
                     delOp(detail.items);
                     break;
                 default:

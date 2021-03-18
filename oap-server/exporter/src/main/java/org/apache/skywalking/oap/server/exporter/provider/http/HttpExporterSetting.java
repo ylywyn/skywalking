@@ -25,7 +25,7 @@ import org.apache.skywalking.oap.server.library.module.ModuleConfig;
 @Setter
 @Getter
 public class HttpExporterSetting extends ModuleConfig {
-    private int bufferChannelSize = 20000;
+    private int bufferChannelSize = 50000;
     private int bufferChannelNum = 2;
     private String cmpGateWay = "";
     private String cmpAddr = "";
