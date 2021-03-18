@@ -25,7 +25,7 @@ public class MetricSubscription {
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     HashMap<String, Set<String>> subscriptions = new HashMap<>();
 
-    private final int interval = 30;
+    private final int interval = 120;
     private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricSubscription.class);
 
