@@ -52,7 +52,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
 
     private MetricSubscription subscription;
     private HashMap<String, CmpMetric> metricCache = new HashMap<String, CmpMetric>();
-
+    private final String[] percentileName = new String[]{"_p50", "_p75", "_p90", "_p95", "_p99"};
 
     public HttpExporter(HttpExporterSetting setting) {
         this.setting = setting;
@@ -125,7 +125,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
 
         int j = 0;
         ExportData temp = null;
-        List<CmpMetric> ms = new ArrayList<CmpMetric>(cap + 1);
+        List<CmpMetric> ms = new ArrayList<CmpMetric>(cap + 6);
 
         //
         Calendar now = Calendar.getInstance();
@@ -136,13 +136,12 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
                 continue;
             }
 
-            CmpMetric m = toCmpMetric(temp);
-            if (m == null) {
+            int count = addCmpMetric(ms, temp);
+            if (count == 0) {
                 continue;
             }
+            j += count;
 
-            ms.add(m);
-            j += 1;
             if (j >= batchCount) {
                 doSend(ms);
                 j = 0;
@@ -197,7 +196,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
         }
     }
 
-    private CmpMetric toCmpMetric(ExportData d) {
+    private int addCmpMetric(List<CmpMetric> ms, ExportData d) {
         CmpMetric cm = getCmpMetric(d.getMeta());
         Metrics metrics = d.getMetrics();
         if (metrics instanceof LongValueHolder) {
@@ -209,13 +208,23 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
         } else if (metrics instanceof DoubleValueHolder) {
             cm.value = ((DoubleValueHolder) metrics).getValue();
         } else if (metrics instanceof MultiIntValuesHolder) {
-            return null;
+            int[] values = ((MultiIntValuesHolder) metrics).getValues();
+            for (int i = 0; i < values.length; i++) {
+                CmpMetric temp = new CmpMetric();
+                temp.metric = cm.metric + percentileName[i];
+                temp.tags = cm.tags;
+                temp.value = values[i];
+                ms.add(temp);
+            }
+            return values.length;
         } else {
-            return null;
+            return 0;
         }
 
+        ms.add(cm);
         //LOGGER.info(cm.metric + " " + d.getMeta().toString() + " " + metrics.getTimeBucket() + "===" + cm.value);
-        return cm;
+
+        return 1;
     }
 
     private CmpMetric getCmpMetric(MetricsMetaInfo meta) {
