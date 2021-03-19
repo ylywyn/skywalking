@@ -278,7 +278,7 @@ public class SkyWalkingAgent {
             cmpUrl = "http://auto-cloud-monitor-lf-pre.openapi.corpautohome.com";
         }
 
-        RegisterThreadImpl mt = new RegisterThreadImpl(Config.Agent.SERVICE_NAME, appName, cmpUrl + "/api/v1/apm/dashboard/global/register");
+        RegisterThreadImpl mt = new RegisterThreadImpl(Config.Agent.SERVICE_NAME, appName, cmpUrl + "/api/v1/apm/register");
         Thread t = new Thread(mt, "RegisterThread");
         t.run();
     }
