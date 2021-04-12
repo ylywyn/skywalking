@@ -68,8 +68,8 @@
     <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/grpc-1.x-plugin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/h2-1.x-plugin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/h2-1.x-plugin/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-plugin/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-plugin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-2.x-plugin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-2.x-plugin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpClient-4.x-plugin/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpClient-4.x-plugin/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpasyncclient-4.x-plugin/src/main/java" charset="UTF-8" />

@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/apm-protocol/apm-network/src/main/proto" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/oap-server/server-query-plugin/query-graphql-plugin/src/main/resources/query-protocol" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/skywalking-ui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/test/e2e/e2e-protocol/src/main/proto" vcs="Git" />
   </component>
 </project>

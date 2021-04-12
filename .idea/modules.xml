@@ -33,6 +33,7 @@
       <module fileurl="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/grpc-1.x-plugin/apm-grpc-1.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/grpc-1.x-plugin/apm-grpc-1.x-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/apm-sniffer/optional-plugins/gson-2.8.x-plugin/apm-gson-2.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/optional-plugins/gson-2.8.x-plugin/apm-gson-2.x-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/h2-1.x-plugin/apm-h2-1.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/h2-1.x-plugin/apm-h2-1.x-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-2.x-plugin/apm-hbase-1.x-2.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-2.x-plugin/apm-hbase-1.x-2.x-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-plugin/apm-hbase-1.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/hbase-1.x-plugin/apm-hbase-1.x-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpClient-4.x-plugin/apm-httpClient-4.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpClient-4.x-plugin/apm-httpClient-4.x-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpasyncclient-4.x-plugin/apm-httpasyncclient-4.x-plugin.iml" filepath="$PROJECT_DIR$/apm-sniffer/apm-sdk-plugin/httpasyncclient-4.x-plugin/apm-httpasyncclient-4.x-plugin.iml" />

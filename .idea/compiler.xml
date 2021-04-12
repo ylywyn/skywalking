@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -202,6 +203,7 @@
         <module name="skywalking-clr-receiver-plugin" />
         <module name="configuration-consul" />
         <module name="server-core" />
+        <module name="apm-hbase-1.x-2.x-plugin" />
         <module name="apm-util" />
         <module name="meter-analyzer" />
         <module name="apm-resttemplate-4.3.x-plugin" />
@@ -241,6 +243,7 @@
       <module name="apm-grpc-1.x-plugin" target="1.8" />
       <module name="apm-gson-2.x-plugin" target="1.8" />
       <module name="apm-h2-1.x-plugin" target="1.8" />
+      <module name="apm-hbase-1.x-2.x-plugin" target="1.8" />
       <module name="apm-hbase-1.x-plugin" target="1.8" />
       <module name="apm-httpasyncclient-4.x-plugin" target="1.8" />
       <module name="apm-httpclient-3.x-plugin" target="1.8" />
