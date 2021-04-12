@@ -19,11 +19,21 @@
 package org.apache.skywalking.oap.server.exporter.provider.http;
 
 import java.io.IOException;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.*;
 import com.google.gson.Gson;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.Call;
+import okhttp3.Callback;
 import org.apache.skywalking.apm.commons.datacarrier.DataCarrier;
 import org.apache.skywalking.apm.commons.datacarrier.consumer.IConsumer;
 import org.apache.skywalking.oap.server.core.analysis.IDManager;
@@ -48,7 +58,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
     private final DataCarrier exportBuffer;
 
     private final OkHttpClient httpClient;
-    private static final MediaType jsonMediaType = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSONMEDIATYPE = MediaType.parse("application/json; charset=utf-8");
 
     private MetricSubscription subscription;
     private HashMap<String, CmpMetric> metricCache = new HashMap<String, CmpMetric>();
@@ -79,7 +89,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
             if (metrics instanceof WithMetadata) {
                 MetricsMetaInfo meta = ((WithMetadata) metrics).getMeta();
                 if (subscription.contains(meta.getMetricsName(), meta.getId())) {
-                    exportBuffer.produce(new ExportData(meta, metrics));
+                    exportBuffer.produce(new ExportData(meta, metrics, event.getType()));
                 }
             }
         }
@@ -161,7 +171,7 @@ public class HttpExporter extends MetricFormatter implements MetricValuesExportS
             String jsonStr = gson.toJson(data);
             Request request = new Request.Builder()
                     .url(setting.getCmpGateWay())
-                    .post(RequestBody.create(jsonMediaType, jsonStr))
+                    .post(RequestBody.create(JSONMEDIATYPE, jsonStr))
                     .build();
 
             httpClient.newCall(request).enqueue(new Callback() {
@@ -281,7 +291,6 @@ class CmpMetric {
     public String[][] tags;
     public double value;
 }
-
 
 class MetricPostResp {
     public int code;

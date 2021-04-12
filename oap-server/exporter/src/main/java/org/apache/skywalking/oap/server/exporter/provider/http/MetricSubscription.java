@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package org.apache.skywalking.oap.server.exporter.provider.http;
 
 import com.google.gson.Gson;
@@ -29,7 +47,6 @@ public class MetricSubscription {
     private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
     private static final Logger LOGGER = LoggerFactory.getLogger(MetricSubscription.class);
 
-
     public boolean contains(String metric, String id) {
         boolean ret = false;
         lock.readLock().lock();
@@ -51,12 +68,12 @@ public class MetricSubscription {
             return false;
         }
 
-        if (resp.Version == this.version) {
+        if (resp.version == this.version) {
             return true;
         }
 
         //all
-        if (resp.IsAll) {
+        if (resp.isAll) {
             HashMap<String, Set<String>> newMap = new HashMap<>();
             newMap = addTo(resp, newMap);
             boolean isOk = true;
@@ -67,14 +84,14 @@ public class MetricSubscription {
                     isOk = false;
                     break;
                 }
-                if (temp.Count == 0 || temp.Details == null) {
+                if (temp.count == 0 || temp.details == null) {
                     break;
                 }
                 i += 1;
                 newMap = addTo(resp, newMap);
             }
             if (isOk) {
-                this.version = resp.Version;
+                this.version = resp.version;
                 lock.writeLock().lock();
                 this.subscriptions = newMap;
                 lock.writeLock().unlock();
@@ -88,12 +105,12 @@ public class MetricSubscription {
         }
 
         //part
-        if (resp.Details == null) {
+        if (resp.details == null) {
             return true;
         }
 
-        for (int i = 0; i < resp.Details.length; i++) {
-            MetricSubRespDetail detail = resp.Details[i];
+        for (int i = 0; i < resp.details.length; i++) {
+            MetricSubRespDetail detail = resp.details[i];
             if (detail.items == null || detail.items.length == 0) {
                 continue;
             }
@@ -107,7 +124,7 @@ public class MetricSubscription {
                 default:
             }
         }
-        this.version = resp.Version;
+        this.version = resp.version;
         LOGGER.info("MetricSubscription update part version {}", this.version);
         return true;
     }
@@ -193,11 +210,11 @@ public class MetricSubscription {
     }
 
     private HashMap<String, Set<String>> addTo(MetricSubResp resp, HashMap<String, Set<String>> map) {
-        if (resp.Details == null || resp.Details.length != 1) {
+        if (resp.details == null || resp.details.length != 1) {
             return map;
         }
 
-        String[][] data = resp.Details[0].items;
+        String[][] data = resp.details[0].items;
         for (int i = 0; i < data.length; i++) {
             String[] items = data[i];
             if (items.length == 2) {
@@ -227,10 +244,10 @@ class TimerTask implements Runnable {
 }
 
 class MetricSubResp {
-    public int Count;
-    public long Version;
-    public boolean IsAll;
-    public MetricSubRespDetail[] Details;
+    public int count;
+    public long version;
+    public boolean isAll;
+    public MetricSubRespDetail[] details;
 }
 
 class MetricSubRespDetail {
