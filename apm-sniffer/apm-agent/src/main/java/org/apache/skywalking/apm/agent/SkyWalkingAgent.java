@@ -266,7 +266,7 @@ public class SkyWalkingAgent {
             isDevEnv = true;
         }
 
-        if (StringUtil.isEmpty(Config.Collector.BACKEND_SERVICE)) {
+        if (StringUtil.isEmpty(Config.Collector.BACKEND_SERVICE) || Config.Collector.BACKEND_SERVICE.startsWith("127.0.0.1")) {
             Config.Collector.BACKEND_SERVICE = "apm-collector.cloud.corpautohome.com:11800";
             if (isDevEnv) {
                 Config.Collector.BACKEND_SERVICE = "monitor-gateway-intranet.autohome.com.cn:11800";
