@@ -468,7 +468,7 @@ exporter:
     targetHost: ${SW_EXPORTER_GRPC_HOST:127.0.0.1}
     targetPort: ${SW_EXPORTER_GRPC_PORT:9870}
   http:
-    cmpGateWay: ${SW_EXPORTER_HTTP_HOST:"http://monitor-insight-gateway-test.openapi.corpautohome.com/api/v1//metrics?token=ad8d5837cd1fd4bf865c4aa0cb1a6ad0"}
+    cmpGateWay: ${SW_EXPORTER_HTTP_HOST:"http://monitor-insight-gateway-test.openapi.corpautohome.com/api/v1/metrics?token=ad8d5837cd1fd4bf865c4aa0cb1a6ad0"}
 
 health-checker:
   selector: ${SW_HEALTH_CHECKER:-}
