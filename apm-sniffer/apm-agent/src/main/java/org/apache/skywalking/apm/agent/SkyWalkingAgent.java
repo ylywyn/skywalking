@@ -297,7 +297,7 @@ class RegisterThreadImpl implements Runnable {
 
     public void run() {
         LogManager.getLogger(SkyWalkingAgent.class)
-                .error("SkyWalking agent  Register Url " + addr);
+                .info("SkyWalking agent  Register Url " + addr);
 
         HttpURLConnection connection = null;
         InputStream is = null;
@@ -322,7 +322,7 @@ class RegisterThreadImpl implements Runnable {
                 result = sbf.toString();
                 if (result.contains("ok")) {
                     LogManager.getLogger(SkyWalkingAgent.class)
-                            .error("SkyWalking agent  Register Ok!");
+                            .info("SkyWalking agent  Register Ok!");
                 } else {
                     LogManager.getLogger(SkyWalkingAgent.class)
                             .error("SkyWalking agent  Register error:" + result);
