@@ -131,11 +131,11 @@ public class SkyWalkingAgent {
         }
 
         agentBuilder.type(pluginFinder.buildMatch())
-                    .transform(new Transformer(pluginFinder))
-                    .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
-                    .with(new RedefinitionListener())
-                    .with(new Listener())
-                    .installOn(instrumentation);
+                .transform(new Transformer(pluginFinder))
+                .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
+                .with(new RedefinitionListener())
+                .with(new Listener())
+                .installOn(instrumentation);
 
         try {
             ServiceManager.INSTANCE.boot();
@@ -249,9 +249,10 @@ public class SkyWalkingAgent {
     public static void InitForAutoCmp() {
         String serviceName = Config.Agent.SERVICE_NAME;
         String appName = System.getenv("CLUSTER_APP_NAME");
+        String appEnv = System.getenv("ENV_NAME");
         if (StringUtil.isEmpty(serviceName) || serviceName.startsWith("Your_ApplicationName")) {
             if (StringUtil.isNotEmpty(appName)) {
-                Config.Agent.SERVICE_NAME = appName;
+                Config.Agent.SERVICE_NAME = appName + ":" + appEnv;
             }
         }
 
