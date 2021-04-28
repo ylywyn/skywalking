@@ -279,7 +279,7 @@ public class SkyWalkingAgent {
             cmpUrl = "http://auto-cloud-monitor-lf-pre.openapi.corpautohome.com";
         }
 
-        RegisterThreadImpl mt = new RegisterThreadImpl(Config.Agent.SERVICE_NAME, appName, cmpUrl + "/api/v1/apm/register");
+        RegisterThreadImpl mt = new RegisterThreadImpl(Config.Agent.SERVICE_NAME, appName, appEnv, cmpUrl + "/api/v1/apm/register");
         Thread t = new Thread(mt, "RegisterThread");
         t.run();
     }
@@ -290,10 +290,10 @@ class RegisterThreadImpl implements Runnable {
     private String app;
     private String addr;
 
-    RegisterThreadImpl(String name, String app, String addr) {
+    RegisterThreadImpl(String name, String app, String appEnv, String addr) {
         this.name = name;
         this.app = app;
-        this.addr = String.format("%s?name=%s&app=%s", addr, name, app);
+        this.addr = String.format("%s?name=%s&app=%s&app_env=%s", addr, name, app, appEnv);
     }
 
     public void run() {
